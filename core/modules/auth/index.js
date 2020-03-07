@@ -1,5 +1,5 @@
 const { provider } = require('./provider')
-const { UserRegistrationError } = require('../exceptions')
+const { UserRegistrationError, UserAuthenticationError } = require('../exceptions')
 
 const registerUserComposition = authProvider => async ({ email, password }) => {
   try {
@@ -13,7 +13,21 @@ const registerUserComposition = authProvider => async ({ email, password }) => {
   }
 }
 
+const loginUserComposition = authProvider => async ({ email, password }) => {
+  try {
+    await authProvider.auth().signInWithEmailAndPassword(email, password)
+    return {
+      email,
+      isLoggedIn: true
+    }
+  } catch (error) {
+    throw new UserAuthenticationError(error)
+  }
+}
+
 module.exports = {
   registerUser: registerUserComposition(provider),
-  registerUserComposition
+  loginUser: loginUserComposition(provider),
+  registerUserComposition,
+  loginUserComposition
 }

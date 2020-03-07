@@ -15,12 +15,18 @@ class Auth {
 
   async createUserWithEmailAndPassword (email, password) {
     if (this.user.email === email) {
-      throw new Error('User already exists.')
+      throw new Error('The email address is already in use by another account.')
     }
     return {
       additionalUserInfo: {
         isNewUser: true
       }
+    }
+  }
+
+  async signInWithEmailAndPassword (email, password) {
+    if (this.user.email !== email) {
+      throw new Error('There is no user record corresponding to this identifier.')
     }
   }
 }

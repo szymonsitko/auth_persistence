@@ -4,7 +4,9 @@
   "description": "App core modules for creating tagged packages",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "test:dependencies": "TEST_ENV=test.dependencies npm test",
+    "test:mocks": "TEST_ENV=test.mocks npm test"
   },
   "author": "Szymon Sitko",
   "license": "ISC",
