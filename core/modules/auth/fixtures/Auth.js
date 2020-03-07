@@ -14,7 +14,7 @@ class Auth {
   }
 
   async createUserWithEmailAndPassword (email, password) {
-    if (this.email === email) {
+    if (this.user.email === email) {
       throw new Error('User already exists.')
     }
     return {
@@ -26,5 +26,9 @@ class Auth {
 }
 
 module.exports = {
-  authProvider: new Auth()
+  authProvider: new Auth(),
+  credentials: {
+    MOCK_EMAIL,
+    MOCK_PASSWORD
+  }
 }
