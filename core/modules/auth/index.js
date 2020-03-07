@@ -1,5 +1,5 @@
-import { provider } from './provider'
-import { UserRegistrationError } from '../exceptions'
+const { provider } = require('./provider')
+const { UserRegistrationError } = require('../exceptions')
 
 const registerUserComposition = authProvider => async ({ email, password }) => {
   try {
