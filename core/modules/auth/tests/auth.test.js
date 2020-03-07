@@ -1,6 +1,9 @@
-const { registerUser } = require('../index')
+const { registerUserComposition } = require('../index')
+const { authProvider } = require('../fixtures/Auth')
 
 describe('auth module test cases', () => {
+  const registerUser = registerUserComposition(authProvider)
+
   describe('registerUser method', () => {
     it('should register new user with given credentials', async () => {
       const credentials = {
