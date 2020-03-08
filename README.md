@@ -9,8 +9,8 @@ Core Module contains its own dependencies, and primarily it's Firebase (for stor
 
 There are two ways of running test suites:
 
-npm run test:dependencies   -> It calls real Firebase account instance
-npm run test:mocks          -> It operates on mocks, created for ease of TDD
+    npm run test:dependencies   -> It calls real Firebase account instance
+    npm run test:mocks          -> It operates on mocks, created for ease of TDD
 
 
 ### About
