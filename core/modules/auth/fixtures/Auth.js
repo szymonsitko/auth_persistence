@@ -42,6 +42,8 @@ class Auth {
       this.user.email = email
     }
   }
+
+  async signOut () {}
 }
 
 module.exports = {

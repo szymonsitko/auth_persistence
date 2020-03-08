@@ -1,9 +1,16 @@
 const { provider } = require('./provider')
-const { UserRegistrationError, UserAuthenticationError, UserDeletionError } = require('../../exceptions')
+const {
+  UserRegistrationError,
+  UserAuthenticationError,
+  UserDeletionError,
+  UserLogoutError
+} = require('../../exceptions')
 
 const registerUserComposition = authProvider => async ({ email, password }) => {
   try {
-    const response = await authProvider.auth().createUserWithEmailAndPassword(email, password)
+    const response = await authProvider
+      .auth()
+      .createUserWithEmailAndPassword(email, password)
     return {
       email,
       isCreated: response.additionalUserInfo.isNewUser
@@ -34,7 +41,25 @@ const deleteUserComposition = authProvider => async () => {
       isDeleted: true
     }
   } catch ({ stack }) {
-    throw new UserDeletionError(`Unable to delete currently authenticated user. Stack trace: ${stack}`)
+    throw new UserDeletionError(
+      `Unable to delete currently authenticated user. Stack trace: ${stack}`
+    )
+  }
+}
+
+const logoutUserComposition = authProvider => async () => {
+  try {
+    const { currentUser } = authProvider.auth()
+    await authProvider.auth().signOut()
+
+    return {
+      currentUser: currentUser.email,
+      isLoggedOut: true
+    }
+  } catch ({ stack }) {
+    throw new UserLogoutError(
+      `Unable to delete currently authenticated user. Stack trace: ${stack}`
+    )
   }
 }
 
@@ -42,7 +67,9 @@ module.exports = {
   registerUser: registerUserComposition(provider),
   loginUser: loginUserComposition(provider),
   deleteUser: deleteUserComposition(provider),
+  logoutUser: logoutUserComposition(provider),
   registerUserComposition,
   loginUserComposition,
-  deleteUserComposition
+  deleteUserComposition,
+  logoutUserComposition
 }
