@@ -12,7 +12,15 @@ class UserAuthenticationError extends Error {
   }
 }
 
+class UserDeletionError extends Error {
+  constructor (message) {
+    super(message)
+    this.name = 'UserDeletionError'
+  }
+}
+
 module.exports = {
   UserRegistrationError,
-  UserAuthenticationError
+  UserAuthenticationError,
+  UserDeletionError
 }

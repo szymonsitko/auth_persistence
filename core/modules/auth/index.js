@@ -1,5 +1,5 @@
 const { provider } = require('./provider')
-const { UserRegistrationError, UserAuthenticationError } = require('../exceptions')
+const { UserRegistrationError, UserAuthenticationError, UserDeletionError } = require('../../exceptions')
 
 const registerUserComposition = authProvider => async ({ email, password }) => {
   try {
@@ -25,9 +25,24 @@ const loginUserComposition = authProvider => async ({ email, password }) => {
   }
 }
 
+const deleteUserComposition = authProvider => async () => {
+  try {
+    const { currentUser } = authProvider.auth()
+    await currentUser.delete()
+    return {
+      currentUser: currentUser.email,
+      isDeleted: true
+    }
+  } catch ({ stack }) {
+    throw new UserDeletionError(`Unable to delete currently authenticated user. Stack trace: ${stack}`)
+  }
+}
+
 module.exports = {
   registerUser: registerUserComposition(provider),
   loginUser: loginUserComposition(provider),
+  deleteUser: deleteUserComposition(provider),
   registerUserComposition,
-  loginUserComposition
+  loginUserComposition,
+  deleteUserComposition
 }

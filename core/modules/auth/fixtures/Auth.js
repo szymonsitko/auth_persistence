@@ -1,11 +1,16 @@
-const MOCK_EMAIL = 'new@email.com'
-const MOCK_PASSWORD = 'mocke_password123'
+const MOCK_EMAIL = 'new_user@email.com'
+const MOCK_PASSWORD = 'secret_password'
 
 class Auth {
   constructor () {
-    this.user = {
-      email: MOCK_EMAIL,
-      password: MOCK_PASSWORD
+    this.user = {}
+    this.currentUser = {
+      async delete () {
+        return Promise.resolve({
+          email: this.email,
+          isDeleted: true
+        })
+      }
     }
   }
 
@@ -16,6 +21,11 @@ class Auth {
   async createUserWithEmailAndPassword (email, password) {
     if (this.user.email === email) {
       throw new Error('The email address is already in use by another account.')
+    } else {
+      this.user = {
+        email: MOCK_EMAIL,
+        password: MOCK_PASSWORD
+      }
     }
     return {
       additionalUserInfo: {
@@ -27,6 +37,9 @@ class Auth {
   async signInWithEmailAndPassword (email, password) {
     if (this.user.email !== email) {
       throw new Error('There is no user record corresponding to this identifier.')
+    } else {
+      this.currentUser.email = email
+      this.user.email = email
     }
   }
 }

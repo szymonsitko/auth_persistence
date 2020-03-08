@@ -2,37 +2,37 @@ const {
   registerUserComposition,
   registerUser,
   loginUserComposition,
-  loginUser
+  loginUser,
+  deleteUserComposition,
+  deleteUser
 } = require('../index')
 const { authProvider, credentials } = require('../fixtures/Auth')
-const { UserRegistrationError, UserAuthenticationError } = require('../../exceptions')
+const { UserRegistrationError, UserAuthenticationError, UserDeletionError } = require('../../../exceptions')
 
-const { MOCK_EMAIL, MOCK_PASSWORD } = credentials
 const useDependencies = process.env.TEST_ENV === 'test.dependencies'
+const loginObject = {
+  email: credentials.MOCK_EMAIL,
+  password: credentials.MOCK_PASSWORD
+}
+const badCredentials = {
+  email: 'non.existent@email.com',
+  password: Date.now().toString()
+}
 
 describe('auth module test cases', () => {
   const registerUserHandler = useDependencies ? registerUser : registerUserComposition(authProvider)
   const loginUserHandler = useDependencies ? loginUser : loginUserComposition(authProvider)
+  const deleteUserHandler = useDependencies ? deleteUser : deleteUserComposition(authProvider)
 
   describe('registerUser method', () => {
     it('should register new user with given credentials', async () => {
-      const credentials = {
-        email: `new_${Date.now()}@email.com`,
-        password: 'secret_password'
-      }
-
-      const userData = await registerUserHandler(credentials)
-      expect(userData.email).toEqual(credentials.email)
+      const userData = await registerUserHandler(loginObject)
+      expect(userData.email).toEqual(loginObject.email)
       expect(userData.isCreated).toEqual(true)
     })
 
     it('should fail with UserRegistrationError error if register fails', () => {
-      const credentials = {
-        email: MOCK_EMAIL,
-        password: MOCK_PASSWORD
-      }
-
-      registerUserHandler(credentials).catch(error => {
+      registerUserHandler(loginObject).catch(error => {
         expect(error).toBeInstanceOf(UserRegistrationError)
         expect(error.message).toContain('The email address is already in use by another account.')
       })
@@ -41,25 +41,31 @@ describe('auth module test cases', () => {
 
   describe('loginUser method', () => {
     it('should return logged user details upon success', async () => {
-      const credentials = {
-        email: 'new@email.com',
-        password: 'qwerty'
-      }
-
-      const userData = await loginUserHandler(credentials)
-      expect(userData.email).toEqual(credentials.email)
+      const userData = await loginUserHandler(loginObject)
+      expect(userData.email).toEqual(loginObject.email)
       expect(userData.isLoggedIn).toEqual(true)
     })
 
     it('should fail with UserAuthenticationError error if login fails', () => {
-      const credentials = {
-        email: 'non.existent@email.com',
-        password: Date.now().toString()
-      }
-
-      loginUserHandler(credentials).catch(error => {
+      loginUserHandler(badCredentials).catch(error => {
         expect(error).toBeInstanceOf(UserAuthenticationError)
         expect(error.message).toContain('There is no user record corresponding to this identifier.')
+      })
+    })
+  })
+
+  describe('deleteUser method', () => {
+    it('should delete existing user', async () => {
+      const { currentUser, isDeleted } = await deleteUserHandler()
+
+      expect(currentUser).toEqual(credentials.MOCK_EMAIL)
+      expect(isDeleted).toBeTruthy()
+    })
+
+    it('should fail with UserDeletionError error if login fails', () => {
+      deleteUserHandler(badCredentials).catch(error => {
+        expect(error).toBeInstanceOf(UserDeletionError)
+        expect(error.message).toContain('Unable to delete currently authenticated user.')
       })
     })
   })
